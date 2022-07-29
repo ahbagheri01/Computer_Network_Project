@@ -30,3 +30,5 @@
 *.exe
 *.out
 *.app
+
+cn-front/node_modules
