@@ -31,4 +31,4 @@
 *.out
 *.app
 
-./cnfrontend/node_modules
+cnfrontend/node_modules/
