@@ -15,20 +15,20 @@ class UserProfile(models.Model):
     ]
 
     full_name=models.CharField(max_length=30)
-    type=models.Choices(choices=USER_TYPE_CHOICES, default=USER)
+    type=models.CharField(choices=USER_TYPE_CHOICES, default=USER, max_length=10)
     strike=models.BooleanField(default=False)
 
 
 class Video(models.Model):
-    file=models.FileField(upload_to='/videos')
+    file=models.FileField(upload_to='videos')
     caption=models.CharField(max_length=50)
-    user=models.ForeignKey(to=User, on_delete=models.SET_NULL)
+    user=models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
     banned=models.BooleanField(default=False)
 
 
 class VideoTag(models.Model):
     label=models.CharField(max_length=15)
-    video=models.ForeignKey(to=Video)
+    video=models.ForeignKey(to=Video, on_delete=models.CASCADE)
 
     class Meta:
         constraints = [
