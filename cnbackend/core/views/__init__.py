@@ -1,1 +1,1 @@
-from .auth import *
+from .video import *
