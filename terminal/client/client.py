@@ -3,6 +3,22 @@ import socket
 token = ""
 current_role = "" # user - admin - manager
 
+# https://nikhilroxtomar.medium.com/file-transfer-using-tcp-socket-in-python3-idiot-developer-c5cf3899819c
+def upload_file_to_server(file_name):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind(("127.0.0.1", 0))
+    s.connect(("127.0.0.1", 5003))
+    f = open(file_name, "rb")
+    s.send(file_name.encode())
+    s.recv(1024)
+    data = f.read()
+    s.sendall(data)
+    s.recv(1024)
+    f.close()
+    s.close()
+
+
 def send_to_server(message):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -15,6 +31,16 @@ def send_to_server(message):
 
 def uploadVideo():
     pass # TODO: upload video
+
+def createVideo():
+    global token
+    name = input("Name: ")
+    message = "create video " + token + " " + name
+    response_from_proxy = send_to_server(message)
+    if response_from_proxy.startswith("Error"):
+        print(response_from_proxy)
+    else:
+        print("Created video!")
 
 def userPanel():
     while True:
@@ -385,6 +411,7 @@ def welcomeMenu():
         print("login admin")
         print("register admin")
         print("login manager")
+        print("upload test file")
         print("exit")
         selection = input("Your selection: ")
         if selection == "login user":
@@ -395,8 +422,10 @@ def welcomeMenu():
             loginAdmin()
         elif selection == "register admin":
             registerAdmin()
-        if selection == "login manager":
+        elif selection == "login manager":
             loginManager()
+        elif selection == "upload test file":
+            upload_file_to_server("class.webm")
         elif selection == "exit":
             break
         else:
