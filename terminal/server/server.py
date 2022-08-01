@@ -13,10 +13,14 @@ port = 5002
 port_upload = 5003
 port_stream = 5004
 
+should_accept = True
+should_accept_lock = threading.Lock()
+
 class User:
-    def __init__(self, username, password):
+    def __init__(self, username, password, number_of_removed_videos = 0):
         self.username = username
         self.password = password
+        self.number_of_removed_videos = number_of_removed_videos
 
 class Admin:
     def __init__(self, username, password, is_accepted = False):
@@ -255,6 +259,9 @@ def removeVideo(data):
     for video in all_videos:
         if video.id == video_id:
             all_videos.remove(video) # TODO: Check if this works correctly
+            for user in all_users:
+                if video.username == user.username:
+                    user.number_of_removed_videos += 1
             return "Success"
     return "Error: video not found"
 
@@ -312,6 +319,8 @@ def answerUserAdminTicket(data):
         return "Error: not authorized"
     for ticket in all_user_admin_tickets:
         if ticket.id == ticket_id:
+            if ticket.status == "closed":
+                return "Error: ticket closed"
             ticket.answer = answer
             return "Success"
     return "Error: ticket ID not found"
@@ -325,6 +334,8 @@ def answerAdminManagerTicket(data):
         return "Error: not authorized"
     for ticket in all_admin_manager_tickets:
         if ticket.id == ticket_id:
+            if ticket.status == "closed":
+                return "Error: ticket closed"
             ticket.answer = answer
             return "Success"
     return "Error: ticket ID not found"
@@ -400,8 +411,50 @@ def createVideo(data):
     user = user_for_token(token)
     if user == None:
         return "Error: not authorized"
+    if user.number_of_removed_videos >= 2:
+        return "Error: strike"
     video_id = str(len(all_videos))
     all_videos.append(Video(video_id, name, user.username))
+    return "Success"
+
+def isStrike(data):
+    global all_users
+    token = data.split(" ")[2]
+    user = user_for_token(token)
+    if user == None:
+        return "Error: not authorized"
+    if user.number_of_removed_videos >= 2:
+        return "Yes"
+    return "No"
+
+def removeStrike(data):
+    global all_users
+    token = data.split(" ")[2]
+    username = data.split(" ")[3]
+    admin = admin_for_token(token)
+    if admin == None:
+        return "Error: not authorized"
+    for user in all_users:
+        if user.username == username:
+            user.number_of_removed_videos = 0
+            return "Success"
+    return "Error: user not found"
+
+def allow_requests():
+    global should_accept
+    global should_accept_lock
+    should_accept_lock.acquire()
+    should_accept = True
+    should_accept_lock.release()
+
+def refuse_requests():
+    global should_accept
+    global should_accept_lock
+    should_accept_lock.acquire()
+    should_accept = False
+    should_accept_lock.release()
+    t = threading.Timer(2.0, allow_requests)
+    t.start()
     return "Success"
 
 def prepare_response(data):
@@ -457,6 +510,14 @@ def prepare_response(data):
         return markAdminManagerTicket(data)
     elif data.startswith("create video"):
         return createVideo(data)
+    elif data.startswith("is strike"):
+        return isStrike(data)
+    elif data.startswith("remove strike"):
+        return removeStrike(data)
+    elif data.startswith("refuse requests"):
+        return refuseRequests()
+    elif data.startswith("ping"):
+        return "pong"
     return "Error: bad request"
 
 # https://medium.com/nerd-for-tech/developing-a-live-video-streaming-application-using-socket-programming-with-python-6bc24e522f19
@@ -473,8 +534,11 @@ def handle_stream():
             image, frame = video.read()
             dump = pickle.dumps(frame)
             message = struct.pack("Q", len(dump)) + dump
-            connection.sendall(message)
-            cv2.imshow("Currently sending", frame)
+            try:
+                connection.sendall(message)
+            except:
+                pass
+            # cv2.imshow("Currently sending", frame)
             wait_key = cv2.waitKey(10)
             if wait_key == 13:
                 connection.close()
@@ -505,11 +569,20 @@ def handle_upload_receive():
 
 
 def accept_connection(connection, source_host, source_port):
+    global should_accept
+    global should_accept_lock
     print("accept_connection() - Accepted connection from " + source_host + ":" + str(source_port))
     data = connection.recv(1024).decode()
     if data == "":
         return
     print("accept_connection() - Received data: '" + data + "'")
+    should_accept_lock.acquire()
+    local_should_accept = should_accept
+    should_accept_lock.release()
+    if not local_should_accept:
+        connection.send("Error: server is currently busy".encode())
+        connection.close()
+        return
     response = prepare_response(data)
     if response != "":
         connection.sendall(response.encode())

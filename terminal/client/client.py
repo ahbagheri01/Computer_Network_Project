@@ -3,6 +3,7 @@ import cv2
 import struct
 import imutils
 import pickle
+from ffpyplayer.player import MediaPlayer
 
 token = ""
 current_role = "" # user - admin - manager
@@ -52,10 +53,13 @@ def stream_file_from_server(file_name):
         raw_frame = data[:messageSize]
         data = data[messageSize:]
         frame = pickle.loads(raw_frame)
-        cv2.imshow("Video", frame)
-        key = cv2.waitKey(10)
-        if key == 13:
+        try:
+            cv2.imshow("Video in Client", frame)
+        except:
+            pass
+        if cv2.waitKey(20) & 0xFF == ord('q'):
             break
+    cv2.destroyAllWindows()
     s.close()
 
 def send_to_server(message):
@@ -69,7 +73,8 @@ def send_to_server(message):
     return response_from_proxy
 
 def uploadVideo():
-    pass # TODO: upload video
+    file_name = input("Video ID (should be the same as file name, without '.mp4'. If not, change the file name before uploading): ")
+    upload_file_to_server(file_name)
 
 def createVideo():
     global token
@@ -81,12 +86,20 @@ def createVideo():
     else:
         print("Created video!")
 
+def streamVideo():
+    if token != "":
+        file_name = input("Video ID: ")
+        stream_file_from_server(file_name)
+    else:
+        print("Error: not authorized")
+
 def userPanel():
     while True:
         print("Welcome to user panel!")
         print("all videos")
         print("create video")
         print("upload video")
+        print("stream video")
         print("like video")
         print("dislike video")
         print("add comment")
@@ -102,6 +115,8 @@ def userPanel():
             createVideo()
         elif selection == "upload video":
             uploadVideo()
+        elif selection == "stream video":
+            streamVideo()
         elif selection == "like video":
             likeVideo()
         elif selection == "dislike video":
@@ -124,8 +139,10 @@ def adminPanel():
     while True:
         print("Welcome to admin panel!")
         print("all videos")
+        print("stream video")
         print("tag video")
         print("remove video")
+        print("remove strike")
         print("see user_admin_tickets")
         print("answer user_admin_ticket")
         print("see admin_manager_tickets")
@@ -136,10 +153,14 @@ def adminPanel():
         selection = input("Your selection: ")
         if selection == "all videos":
             allVideos()
+        elif selection == "stream video":
+            streamVideo()
         elif selection == "tag videos":
             tagVideo()
         elif selection == "remove videos":
             removeVideo()
+        elif selection == "remove strike":
+            removeStrike()
         elif selection == "see user_admin_tickets":
             seeUserAdminTickets()
         elif selection == "answer user_admin_ticket":
@@ -374,6 +395,26 @@ def removeVideo():
         print(response_from_proxy)
     else:
         print("Removed!")
+
+def removeStrike():
+    global token
+    username = input("Username: ")
+    message = "remove strike " + token + " " + username
+    response_from_proxy = send_to_server(message)
+    if response_from_proxy.startswith("Error"):
+        print(response_from_proxy)
+    else:
+        print("Removed!")
+
+def isStrike():
+    global token
+    message = "is strike " + token
+    response_from_proxy = send_to_server(message)
+    if response_from_proxy.startswith("Error"):
+        print(response_from_proxy)
+        return True
+    else:
+        return response_from_proxy.startswith("Yes")
 
 def loginUser():
     global token
