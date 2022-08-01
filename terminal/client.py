@@ -58,11 +58,33 @@ def adminPanel():
 def managerPanel():
     while True:
         print("Welcome to manager panel!")
+        print("all admins")
+        print("authorize admin")
         print("logout")
         selection = input("Your selection: ")
-        if selection == "logout":
+        if selection == "all admins":
+            allAdmins()
+        elif selection == "authorize admin":
+            authorizeAdmin()
+        elif selection == "logout":
             if logoutManager():
                 break
+
+def allAdmins():
+    global token
+    message = "all admins " + token
+    response_from_proxy = send_to_server(message)
+    print(response_from_proxy)
+
+def authorizeAdmin():
+    global token
+    admin_username = input("Admin username: ")
+    message = "authorize admin " + token + " " + admin_username
+    response_from_proxy = send_to_server(message)
+    if response_from_proxy.startswith("Error"):
+        print(response_from_proxy)
+    else:
+        print("Authorized!")
 
 def logoutUser():
     global token

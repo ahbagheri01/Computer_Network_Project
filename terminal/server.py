@@ -240,6 +240,30 @@ def removeVideo(data):
             return "Success"
     return "Error: video not found"
 
+def allAdmins(data):
+    global manager_token
+    global all_admins
+    token = data.split(" ")[2]
+    if token != manager_token:
+        return "Error: not authorized"
+    response = ""
+    for user in all_admins:
+        response += "Username: " + user.username + " - Password: " + user.password + " - Is Accepted: " + user.is_accepted + "\n"
+    return 
+    
+def authorizeAdmin(data):
+    global manager_token
+    global all_admins
+    token = data.split(" ")[2]
+    if token != manager_token:
+        return "Error: not authorized"
+    username = data.split(" ")[3]
+    for user in all_admins:
+        if user.username == username:
+            user.is_accepted = True
+            return "Success"
+    return "Error: admin not found"
+
 def prepare_response(data):
     if data.startswith("login user"):
         return loginUser(data)
@@ -271,6 +295,10 @@ def prepare_response(data):
         return tagVideo(data)
     elif data.startswith("remove video"):
         return removeVideo(data)
+    elif data.startswith("all admins"):
+        return allAdmins(data)
+    elif data.startswith("authorize admin"):
+        return authorizeAdmin(data)
     return "Error: bad request"
 
 
