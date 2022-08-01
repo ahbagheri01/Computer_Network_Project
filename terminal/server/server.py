@@ -1,12 +1,17 @@
 import threading
 import time
 import socket
+import cv2
+import struct
+import imutils
+import pickle
 
 # TODO: Handles no space in contents whatsoever!
 
 host = "127.0.0.1"
 port = 5002
 port_upload = 5003
+port_stream = 5004
 
 class User:
     def __init__(self, username, password):
@@ -454,13 +459,36 @@ def prepare_response(data):
         return createVideo(data)
     return "Error: bad request"
 
+# https://medium.com/nerd-for-tech/developing-a-live-video-streaming-application-using-socket-programming-with-python-6bc24e522f19
 def handle_stream():
-    pass
+    global s_stream
+    while True:
+        connection, address = s_stream.accept()
+        if not connection:
+            continue
+        file_name = connection.recv(1024).decode()
+        connection.send("File name received".encode())
+        video = cv2.VideoCapture(file_name)
+        while video.isOpened():
+            image, frame = video.read()
+            dump = pickle.dumps(frame)
+            message = struct.pack("Q", len(dump)) + dump
+            connection.sendall(message)
+            cv2.imshow("Currently sending", frame)
+            wait_key = cv2.waitKey(10)
+            if wait_key == 13:
+                connection.close()
+
+
+
+
 
 def handle_upload_receive():
     global s_upload
     while True:
         connection, address = s_upload.accept()
+        if not connection:
+            continue
         file_name = connection.recv(1024).decode()
         connection.send("File name received".encode())
         file = open(file_name, "wb")
@@ -500,10 +528,10 @@ s_upload.bind((host, port_upload))
 s_upload.listen(5)
 
 # https://medium.com/nerd-for-tech/developing-a-live-video-streaming-application-using-socket-programming-with-python-6bc24e522f19
-s_upload = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s_upload.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-s_upload.bind((host, port_upload))
-s_upload.listen(5)
+s_stream = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s_stream.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+s_stream.bind((host, port_stream))
+s_stream.listen(5)
 
 print("Welcome to server!")
 

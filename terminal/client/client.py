@@ -1,4 +1,8 @@
 import socket
+import cv2
+import struct
+import imutils
+import pickle
 
 token = ""
 current_role = "" # user - admin - manager
@@ -18,6 +22,41 @@ def upload_file_to_server(file_name):
     f.close()
     s.close()
 
+# https://medium.com/nerd-for-tech/developing-a-live-video-streaming-application-using-socket-programming-with-python-6bc24e522f19
+def stream_file_from_server(file_name):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind(("127.0.0.1", 0))
+    s.connect(("127.0.0.1", 5004))
+    s.send(file_name.encode())
+    s.recv(1024)
+    data = b""
+    payload_size = struct.calcsize("Q")
+    while True:
+        should_break = False
+        while payload_size > len(data):
+            received_packet = s.recv(4096)
+            if not received_packet:
+                should_break = True
+                break
+            else:
+                data += received_packet
+        if should_break:
+            break
+        size = data[:payload_size]
+        data = data[payload_size:]
+        messageSize = struct.unpack("Q", size)[0]
+        while messageSize > len(data):
+            received_packet = s.recv(4096)
+            data += received_packet
+        raw_frame = data[:messageSize]
+        data = data[messageSize:]
+        frame = pickle.loads(raw_frame)
+        cv2.imshow("Video", frame)
+        key = cv2.waitKey(10)
+        if key == 13:
+            break
+    s.close()
 
 def send_to_server(message):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -412,6 +451,7 @@ def welcomeMenu():
         print("register admin")
         print("login manager")
         print("upload test file")
+        print("stream test file")
         print("exit")
         selection = input("Your selection: ")
         if selection == "login user":
@@ -425,7 +465,9 @@ def welcomeMenu():
         elif selection == "login manager":
             loginManager()
         elif selection == "upload test file":
-            upload_file_to_server("class.webm")
+            upload_file_to_server("1.mp4")
+        elif selection == "stream test file":
+            stream_file_from_server("1.mp4")
         elif selection == "exit":
             break
         else:
