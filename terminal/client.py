@@ -23,6 +23,7 @@ def userPanel():
         print("show comments")
         print("see user_admin_tickets")
         print("send user_admin_ticket")
+        print("mark user_admin_ticket")
         print("logout")
         selection = input("Your selection: ")
         if selection == "all videos":
@@ -39,6 +40,8 @@ def userPanel():
             seeUserAdminTickets()
         elif selection == "send user_admin_ticket":
             sendUserAdminTicket()
+        elif selection == "mark user_admin_ticket":
+            markUserAdminTicket()
         elif selection == "logout":
             if logoutUser():
                 break
@@ -53,6 +56,8 @@ def adminPanel():
         print("answer user_admin_ticket")
         print("see admin_manager_tickets")
         print("send admin_manager_ticket")
+        print("mark user_admin_ticket")
+        print("mark admin_manager_ticket")
         print("logout")
         selection = input("Your selection: ")
         if selection == "all videos":
@@ -69,6 +74,10 @@ def adminPanel():
             seeAdminManagerTickets()
         elif selection == "send admin_manager_ticket":
             sendAdminManagerTicket()
+        elif selection == "mark user_admin_ticket":
+            markUserAdminTicket()
+        elif selection == "mark admin_manager_ticket":
+            markAdminManagerTicket()
         elif selection == "logout":
             if logoutAdmin():
                 break
@@ -80,6 +89,7 @@ def managerPanel():
         print("authorize admin")
         print("see admin_manager_tickets")
         print("answer admin_manager_ticket")
+        print("mark admin_manager_ticket")
         print("logout")
         selection = input("Your selection: ")
         if selection == "all admins":
@@ -90,9 +100,33 @@ def managerPanel():
             seeAdminManagerTickets()
         elif selection == "answer admin_manager_tickets":
             answerAdminManagerTicket()
+        elif selection == "mark admin_manager_ticket":
+            markAdminManagerTicket()
         elif selection == "logout":
             if logoutManager():
                 break
+
+def markUserAdminTicket():
+    global token
+    ticketID = input("Ticket ID: ")
+    status = input("Status (from 'new', 'waiting', 'solved' and 'closed': ")
+    message = "mark user_admin_ticket " + token + " " + ticketID + " " + status
+    response_from_proxy = send_to_server(message)
+    if response_from_proxy.startswith("Error"):
+        print(response_from_proxy)
+    else:
+        print("Marked!")
+
+def markAdminManagerTicket():
+    global token
+    ticketID = input("Ticket ID: ")
+    status = input("Status (from 'new', 'waiting', 'solved' and 'closed': ")
+    message = "mark admin_manager_ticket " + token + " " + ticketID + " " + status
+    response_from_proxy = send_to_server(message)
+    if response_from_proxy.startswith("Error"):
+        print(response_from_proxy)
+    else:
+        print("Marked!")
 
 def seeUserAdminTickets():
     global token

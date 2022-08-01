@@ -35,11 +35,12 @@ class Video:
         self.is_tagged = is_tagged
 
 class Ticket:
-    def __init__(self, id, username, content, answer = ""):
+    def __init__(self, id, username, content, answer = "", status = "new"): # new, waiting, solved, closed
         self.id = id
         self.username = username
         self.content = content
         self.answer = answer
+        self.status = status
 
 all_users = []
 all_admins = []
@@ -335,9 +336,9 @@ def seeUserAdminTickets(data):
     for ticket in all_user_admin_tickets:
         if user != None:
             if ticket.user == user.username:
-                response += "ID: " + ticket.id + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
+                response += "ID: " + ticket.id + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
         else:
-            response += "ID: " + ticket.id + + " - Username: " + ticket.username + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
+            response += "ID: " + ticket.id + " - Username: " + ticket.username + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
     return response
 
 def seeAdminManagerTickets(data):
@@ -351,10 +352,41 @@ def seeAdminManagerTickets(data):
     for ticket in all_admin_manager_tickets:
         if admin != None:
             if ticket.user == admin.username:
-                response += "ID: " + ticket.id + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
+                response += "ID: " + ticket.id + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
         else:
-            response += "ID: " + ticket.id + + " - Username: " + ticket.username + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
+            response += "ID: " + ticket.id + + " - Username: " + ticket.username + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
     return response
+
+def markUserAdminTicket(data):
+    global all_user_admin_tickets
+    token = data.split(" ")[2]
+    ticket_id = data.split(" ")[3]
+    status = data.split(" ")[4]
+    user = user_for_token(token)
+    if user == None:
+        admin = admin_for_token(token)
+        if admin == None:
+            return "Error: not authorized"
+    for ticket in all_user_admin_tickets:
+        if ticket.id == ticket_id:
+            ticket.status = status
+            return "Success"
+    return "Error: ticket ID not found"
+
+def markAdminManagerTicket(data):
+    global all_admin_manager_tickets
+    token = data.split(" ")[2]
+    ticket_id = data.split(" ")[3]
+    status = data.split(" ")[4]
+    admin = admin_for_token(token)
+    if admin == None:
+        if manager_token != token:
+            return "Error: not authorized"
+    for ticket in all_admin_manager_tickets:
+        if ticket.id == ticket_id:
+            ticket.status = status
+            return "Success"
+    return "Error: ticket ID not found"
 
 def prepare_response(data):
     if data.startswith("login user"):
@@ -403,6 +435,10 @@ def prepare_response(data):
         return seeUserAdminTickets(data)
     elif data.startswith("see admin_manager_tickets"):
         return seeAdminManagerTickets(data)
+    elif data.startswith("mark user_admin_ticket"):
+        return markUserAdminTicket(data)
+    elif data.startswith("mark admin_manager_ticket"):
+        return markAdminManagerTicket(data)
     return "Error: bad request"
 
 
