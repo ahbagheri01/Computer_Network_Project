@@ -62,11 +62,11 @@ def stream_file_from_server(file_name):
     cv2.destroyAllWindows()
     s.close()
 
-def send_to_server(message):
+def send_to_server(message, should_use_proxy = False):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind(("127.0.0.1", 0))
-    s.connect(("127.0.0.1", 5002))
+    s.connect(("127.0.0.1", 6001 if should_use_proxy else 5002))
     s.sendall(message.encode())
     response_from_proxy = s.recv(1024).decode()
     s.close()
@@ -152,29 +152,29 @@ def adminPanel():
         print("logout")
         selection = input("Your selection: ")
         if selection == "all videos":
-            allVideos()
+            allVideos(True)
         elif selection == "stream video":
-            streamVideo()
+            streamVideo() # TODO: Proxy here
         elif selection == "tag videos":
-            tagVideo()
+            tagVideo(True)
         elif selection == "remove videos":
-            removeVideo()
+            removeVideo(True)
         elif selection == "remove strike":
-            removeStrike()
+            removeStrike(True)
         elif selection == "see user_admin_tickets":
-            seeUserAdminTickets()
+            seeUserAdminTickets(True)
         elif selection == "answer user_admin_ticket":
-            answerUserAdminTicket()
+            answerUserAdminTicket(True)
         elif selection == "see admin_manager_tickets":
-            seeAdminManagerTickets()
+            seeAdminManagerTickets(True)
         elif selection == "send admin_manager_ticket":
-            sendAdminManagerTicket()
+            sendAdminManagerTicket(True)
         elif selection == "mark user_admin_ticket":
-            markUserAdminTicket()
+            markUserAdminTicket(True)
         elif selection == "mark admin_manager_ticket":
-            markAdminManagerTicket()
+            markAdminManagerTicket(True)
         elif selection == "logout":
-            if logoutAdmin():
+            if logoutAdmin(True):
                 break
 
 def managerPanel():
@@ -201,38 +201,38 @@ def managerPanel():
             if logoutManager():
                 break
 
-def markUserAdminTicket():
+def markUserAdminTicket(proxy = False):
     global token
     ticketID = input("Ticket ID: ")
     status = input("Status (from 'new', 'waiting', 'solved' and 'closed': ")
     message = "mark user_admin_ticket " + token + " " + ticketID + " " + status
-    response_from_proxy = send_to_server(message)
+    response_from_proxy = send_to_server(message, proxy)
     if response_from_proxy.startswith("Error"):
         print(response_from_proxy)
     else:
         print("Marked!")
 
-def markAdminManagerTicket():
+def markAdminManagerTicket(proxy = False):
     global token
     ticketID = input("Ticket ID: ")
     status = input("Status (from 'new', 'waiting', 'solved' and 'closed': ")
     message = "mark admin_manager_ticket " + token + " " + ticketID + " " + status
-    response_from_proxy = send_to_server(message)
+    response_from_proxy = send_to_server(message, proxy)
     if response_from_proxy.startswith("Error"):
         print(response_from_proxy)
     else:
         print("Marked!")
 
-def seeUserAdminTickets():
+def seeUserAdminTickets(proxy = False):
     global token
     message = "see user_admin_tickets " + token
-    response_from_proxy = send_to_server(message)
+    response_from_proxy = send_to_server(message, proxy)
     print(response_from_proxy)
 
-def seeAdminManagerTickets():
+def seeAdminManagerTickets(proxy = False):
     global token
     message = "see admin_manager_tickets " + token
-    response_from_proxy = send_to_server(message)
+    response_from_proxy = send_to_server(message, proxy)
     print(response_from_proxy)
 
 def sendUserAdminTicket():
@@ -245,22 +245,22 @@ def sendUserAdminTicket():
     else:
         print("Sent!")
 
-def sendAdminManagerTicket():
+def sendAdminManagerTicket(proxy = False):
     global token
     content = input("Content: ")
     message = "send admin_manager_ticket " + token + " " + content
-    response_from_proxy = send_to_server(message)
+    response_from_proxy = send_to_server(message, proxy)
     if response_from_proxy.startswith("Error"):
         print(response_from_proxy)
     else:
         print("Sent!")
 
-def answerUserAdminTicket():
+def answerUserAdminTicket(proxy = False):
     global token
     ticketID = input("Ticket ID: ")
     answer = input("Answer: ")
     message = "answer user_admin_ticket " + token + " " + ticketID + " " + answer
-    response_from_proxy = send_to_server(message)
+    response_from_proxy = send_to_server(message, proxy)
     if response_from_proxy.startswith("Error"):
         print(response_from_proxy)
     else:
@@ -306,11 +306,11 @@ def logoutUser():
         current_role = ""
         return True
 
-def logoutAdmin():
+def logoutAdmin(proxy = False):
     global token
     global current_role
     message = "logout admin " + token
-    response_from_proxy = send_to_server(message)
+    response_from_proxy = send_to_server(message, proxy)
     if response_from_proxy.startswith("Error"):
         print(response_from_proxy)
         return False
@@ -332,10 +332,10 @@ def logoutManager():
         current_role = ""
         return True
 
-def allVideos():
+def allVideos(proxy = False):
     global token
     message = "all videos " + token
-    response_from_proxy = send_to_server(message)
+    response_from_proxy = send_to_server(message, proxy)
     print(response_from_proxy)
 
 def likeVideo():
@@ -376,31 +376,31 @@ def showComments():
     response_from_proxy = send_to_server(message)
     print(response_from_proxy)
 
-def tagVideo():
+def tagVideo(proxy = False):
     global token
     video_id = input("Video ID: ")
     message = "tag video " + token + " " + video_id
-    response_from_proxy = send_to_server(message)
+    response_from_proxy = send_to_server(message, proxy)
     if response_from_proxy.startswith("Error"):
         print(response_from_proxy)
     else:
         print("Tagged!")
 
-def removeVideo():
+def removeVideo(proxy = False):
     global token
     video_id = input("Video ID: ")
     message = "remove video " + token + " " + video_id
-    response_from_proxy = send_to_server(message)
+    response_from_proxy = send_to_server(message, proxy)
     if response_from_proxy.startswith("Error"):
         print(response_from_proxy)
     else:
         print("Removed!")
 
-def removeStrike():
+def removeStrike(proxy = False):
     global token
     username = input("Username: ")
     message = "remove strike " + token + " " + username
-    response_from_proxy = send_to_server(message)
+    response_from_proxy = send_to_server(message, proxy)
     if response_from_proxy.startswith("Error"):
         print(response_from_proxy)
     else:
@@ -442,13 +442,13 @@ def registerUser():
     else:
         print("Registered!")
 
-def loginAdmin():
+def loginAdmin(proxy = False):
     global token
     global current_role
     username = input("Username: ")
     password = input("Password: ")
     message = "login admin " + username + " " + password
-    response_from_proxy = send_to_server(message)
+    response_from_proxy = send_to_server(message, proxy)
     if response_from_proxy.startswith("Error"):
         print(response_from_proxy)
     else:
@@ -457,12 +457,12 @@ def loginAdmin():
         current_role = "admin"
         adminPanel()
 
-def registerAdmin():
+def registerAdmin(proxy = False):
     global token
     username = input("Username: ")
     password = input("Password: ")
     message = "register admin " + username + " " + password
-    response_from_proxy = send_to_server(message)
+    response_from_proxy = send_to_server(message, proxy)
     if response_from_proxy.startswith("Error"):
         print(response_from_proxy)
     else:
@@ -500,9 +500,9 @@ def welcomeMenu():
         elif selection == "register user":
             registerUser()
         elif selection == "login admin":
-            loginAdmin()
+            loginAdmin(True)
         elif selection == "register admin":
-            registerAdmin()
+            registerAdmin(True)
         elif selection == "login manager":
             loginManager()
         elif selection == "upload test file":
