@@ -3,6 +3,8 @@ import threading
 import time
 import socket
 
+# TODO: Handles no space in contents whatsoever!
+
 host = "127.0.0.1"
 port = 5002
 
@@ -32,9 +34,19 @@ class Video:
         self.comments = comments
         self.is_tagged = is_tagged
 
+class Ticket:
+    def __init__(self, id, username, content, answer = ""):
+        self.id = id
+        self.username = username
+        self.content = content
+        self.answer = answer
+
 all_users = []
 all_admins = []
 all_videos = []
+
+all_user_admin_tickets = []
+all_admin_manager_tickets = []
 
 user_tokens = []
 admin_tokens = []
@@ -264,6 +276,86 @@ def authorizeAdmin(data):
             return "Success"
     return "Error: admin not found"
 
+def sendUserAdminTicket(data):
+    global all_user_admin_tickets
+    token = data.split(" ")[2]
+    content = data.split(" ")[3]
+    user = user_for_token(token)
+    if user == None:
+        return "Error: not authorized"
+    all_user_admin_tickets.append(Ticket(user.username, content))
+    return "Success"
+
+def sendAdminManagerTicket(data):
+    global all_admin_manager_tickets
+    token = data.split(" ")[2]
+    content = data.split(" ")[3]
+    user = admin_for_token(token)
+    if user == None:
+        return "Error: not authorized"
+    all_admin_manager_tickets.append(Ticket(user.username, content))
+    return "Success"
+
+def answerUserAdminTicket(data):
+    global all_user_admin_tickets
+    token = data.split(" ")[2]
+    ticket_id = data.split(" ")[3]
+    answer = data.split(" ")[4]
+    user = admin_for_token(token)
+    if user == None:
+        return "Error: not authorized"
+    for ticket in all_user_admin_tickets:
+        if ticket.id == ticket_id:
+            ticket.answer = answer
+            return "Success"
+    return "Error: ticket ID not found"
+
+def answerAdminManagerTicket(data):
+    global all_admin_manager_tickets
+    token = data.split(" ")[2]
+    ticket_id = data.split(" ")[3]
+    answer = data.split(" ")[4]
+    if token != manager_token:
+        return "Error: not authorized"
+    for ticket in all_admin_manager_tickets:
+        if ticket.id == ticket_id:
+            ticket.answer = answer
+            return "Success"
+    return "Error: ticket ID not found"
+
+def seeUserAdminTickets(data):
+    global all_user_admin_tickets
+    token = data.split(" ")[2]
+    user = user_for_token(token)
+    if user == None:
+        admin = admin_for_token(token)
+        if admin == None:
+            return "Error: not authorized"
+    response = ""
+    for ticket in all_user_admin_tickets:
+        if user != None:
+            if ticket.user == user.username:
+                response += "ID: " + ticket.id + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
+        else:
+            response += "ID: " + ticket.id + + " - Username: " + ticket.username + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
+    return response
+
+def seeAdminManagerTickets(data):
+    global all_admin_manager_tickets
+    token = data.split(" ")[2]
+    admin = admin_for_token(token)
+    if admin == None:
+        if token != manager_token:
+            return "Error: not authorized"
+    response = ""
+    for ticket in all_admin_manager_tickets:
+        if admin != None:
+            if ticket.user == admin.username:
+                response += "ID: " + ticket.id + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
+        else:
+            response += "ID: " + ticket.id + + " - Username: " + ticket.username + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
+    return response
+
 def prepare_response(data):
     if data.startswith("login user"):
         return loginUser(data)
@@ -299,6 +391,18 @@ def prepare_response(data):
         return allAdmins(data)
     elif data.startswith("authorize admin"):
         return authorizeAdmin(data)
+    elif data.startswith("send user_admin_ticket"):
+        return sendUserAdminTicket(data)
+    elif data.startswith("send admin_manager_ticket"):
+        return sendAdminManagerTicket(data)
+    elif data.startswith("answer user_admin_ticket"):
+        return answerUserAdminTicket(data)
+    elif data.startswith("answer admin_manager_ticket"):
+        return answerAdminManagerTicket(data)
+    elif data.startswith("see user_admin_tickets"):
+        return seeUserAdminTickets(data)
+    elif data.startswith("see admin_manager_tickets"):
+        return seeAdminManagerTickets(data)
     return "Error: bad request"
 
 

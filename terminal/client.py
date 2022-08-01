@@ -21,6 +21,8 @@ def userPanel():
         print("dislike video")
         print("add comment")
         print("show comments")
+        print("see user_admin_tickets")
+        print("send user_admin_ticket")
         print("logout")
         selection = input("Your selection: ")
         if selection == "all videos":
@@ -33,6 +35,10 @@ def userPanel():
             addComment()
         elif selection == "show comments":
             showComments()
+        elif selection == "see user_admin_tickets":
+            seeUserAdminTickets()
+        elif selection == "send user_admin_ticket":
+            sendUserAdminTicket()
         elif selection == "logout":
             if logoutUser():
                 break
@@ -43,6 +49,10 @@ def adminPanel():
         print("all videos")
         print("tag video")
         print("remove video")
+        print("see user_admin_tickets")
+        print("answer user_admin_ticket")
+        print("see admin_manager_tickets")
+        print("send admin_manager_ticket")
         print("logout")
         selection = input("Your selection: ")
         if selection == "all videos":
@@ -51,6 +61,14 @@ def adminPanel():
             tagVideo()
         elif selection == "remove videos":
             removeVideo()
+        elif selection == "see user_admin_tickets":
+            seeUserAdminTickets()
+        elif selection == "answer user_admin_ticket":
+            answerUserAdminTicket()
+        elif selection == "see admin_manager_tickets":
+            seeAdminManagerTickets()
+        elif selection == "send admin_manager_ticket":
+            sendAdminManagerTicket()
         elif selection == "logout":
             if logoutAdmin():
                 break
@@ -60,15 +78,75 @@ def managerPanel():
         print("Welcome to manager panel!")
         print("all admins")
         print("authorize admin")
+        print("see admin_manager_tickets")
+        print("answer admin_manager_ticket")
         print("logout")
         selection = input("Your selection: ")
         if selection == "all admins":
             allAdmins()
         elif selection == "authorize admin":
             authorizeAdmin()
+        elif selection == "see admin_manager_tickets":
+            seeAdminManagerTickets()
+        elif selection == "answer admin_manager_tickets":
+            answerAdminManagerTicket()
         elif selection == "logout":
             if logoutManager():
                 break
+
+def seeUserAdminTickets():
+    global token
+    message = "see user_admin_tickets " + token
+    response_from_proxy = send_to_server(message)
+    print(response_from_proxy)
+
+def seeAdminManagerTickets():
+    global token
+    message = "see admin_manager_tickets " + token
+    response_from_proxy = send_to_server(message)
+    print(response_from_proxy)
+
+def sendUserAdminTicket():
+    global token
+    content = input("Content: ")
+    message = "send user_admin_ticket " + token + " " + content
+    response_from_proxy = send_to_server(message)
+    if response_from_proxy.startswith("Error"):
+        print(response_from_proxy)
+    else:
+        print("Sent!")
+
+def sendAdminManagerTicket():
+    global token
+    content = input("Content: ")
+    message = "send admin_manager_ticket " + token + " " + content
+    response_from_proxy = send_to_server(message)
+    if response_from_proxy.startswith("Error"):
+        print(response_from_proxy)
+    else:
+        print("Sent!")
+
+def answerUserAdminTicket():
+    global token
+    ticketID = input("Ticket ID: ")
+    answer = input("Answer: ")
+    message = "answer user_admin_ticket " + token + " " + ticketID + " " + answer
+    response_from_proxy = send_to_server(message)
+    if response_from_proxy.startswith("Error"):
+        print(response_from_proxy)
+    else:
+        print("Sent!")
+
+def answerAdminManagerTicket():
+    global token
+    ticketID = input("Ticket ID: ")
+    answer = input("Answer: ")
+    message = "answer admin_manager_ticket " + token + " " + ticketID + " " + answer
+    response_from_proxy = send_to_server(message)
+    if response_from_proxy.startswith("Error"):
+        print(response_from_proxy)
+    else:
+        print("Sent!")
 
 def allAdmins():
     global token
