@@ -16,16 +16,31 @@ def send_to_server(message):
 def userPanel():
     while True:
         print("Welcome to user panel!")
-        print("Logout")
+        print("all videos")
+        print("like video")
+        print("dislike video")
+        print("add comment")
+        print("show comments")
+        print("logout")
         selection = input("Your selection: ")
-        if selection == "logout":
+        if selection == "all videos":
+            allVideos()
+        elif selection == "like video":
+            likeVideo()
+        elif selection == "dislike video":
+            dislikeVideo()
+        elif selection == "add comment":
+            addComment()
+        elif selection == "show comments":
+            showComments()
+        elif selection == "logout":
             if logoutUser():
                 break
 
 def adminPanel():
     while True:
         print("Welcome to admin panel!")
-        print("Logout")
+        print("logout")
         selection = input("Your selection: ")
         if selection == "logout":
             if logoutAdmin():
@@ -34,7 +49,7 @@ def adminPanel():
 def managerPanel():
     while True:
         print("Welcome to manager panel!")
-        print("Logout")
+        print("logout")
         selection = input("Your selection: ")
         if selection == "logout":
             if logoutManager():
@@ -78,6 +93,50 @@ def logoutManager():
         token = ""
         current_role = ""
         return True
+
+def allVideos():
+    global token
+    message = "all videos " + token
+    response_from_proxy = send_to_server(message)
+    print(response_from_proxy)
+
+def likeVideo():
+    global token
+    video_id = input("Video ID: ")
+    message = "like video " + token + " " + video_id
+    response_from_proxy = send_to_server(message)
+    if response_from_proxy.startswith("Error"):
+        print(response_from_proxy)
+    else:
+        print("Liked!")
+
+def dislikeVideo():
+    global token
+    video_id = input("Video ID: ")
+    message = "dislike video " + token + " " + video_id
+    response_from_proxy = send_to_server(message)
+    if response_from_proxy.startswith("Error"):
+        print(response_from_proxy)
+    else:
+        print("Disliked!")
+
+def addComment():
+    global token
+    video_id = input("Video ID: ")
+    text = input("Comment text: ")
+    message = "add comment " + token + " " + video_id + " " + text
+    response_from_proxy = send_to_server(message)
+    if response_from_proxy.startswith("Error"):
+        print(response_from_proxy)
+    else:
+        print("Added comment!")
+
+def showComments():
+    global token
+    video_id = input("Video ID: ")
+    message = "show comments " + token + " " + video_id
+    response_from_proxy = send_to_server(message)
+    print(response_from_proxy)
 
 def loginUser():
     global token
