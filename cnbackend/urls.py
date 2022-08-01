@@ -25,5 +25,6 @@ urlpatterns = [
     path('api/token/verify/', verify_jwt_token),
     path('api/token/refresh/', refresh_jwt_token),
 
-    path('api/video/<int:id>', GetVideoData.as_view())
+    path('api/video/<int:id>', GetVideoData.as_view()),
+    path('api/video/stream/<path>', StreamVideo.as_view())
 ]
