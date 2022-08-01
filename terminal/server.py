@@ -214,6 +214,32 @@ def showComments(data):
             return response
     return "Error: video not found"
 
+def tagVideo(data):
+    global all_videos
+    token = data.split(" ")[2]
+    video_id = data.split(" ")[3]
+    user = admin_for_token(token)
+    if user == None:
+        return "Error: not authorized"
+    for video in all_videos:
+        if video.id == video_id:
+            video.is_tagged = True
+            return "Success"
+    return "Error: video not found"
+
+def removeVideo(data):
+    global all_videos
+    token = data.split(" ")[2]
+    video_id = data.split(" ")[3]
+    user = admin_for_token(token)
+    if user == None:
+        return "Error: not authorized"
+    for video in all_videos:
+        if video.id == video_id:
+            all_videos.remove(video) # TODO: Check if this works correctly
+            return "Success"
+    return "Error: video not found"
+
 def prepare_response(data):
     if data.startswith("login user"):
         return loginUser(data)
@@ -241,6 +267,10 @@ def prepare_response(data):
         return addComment(data)
     elif data.startswith("show comments"):
         return showComments(data)
+    elif data.startswith("tag video"):
+        return tagVideo(data)
+    elif data.startswith("remove video"):
+        return removeVideo(data)
     return "Error: bad request"
 
 

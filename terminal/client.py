@@ -40,9 +40,18 @@ def userPanel():
 def adminPanel():
     while True:
         print("Welcome to admin panel!")
+        print("all videos")
+        print("tag video")
+        print("remove video")
         print("logout")
         selection = input("Your selection: ")
-        if selection == "logout":
+        if selection == "all videos":
+            allVideos()
+        elif selection == "tag videos":
+            tagVideo()
+        elif selection == "remove videos":
+            removeVideo()
+        elif selection == "logout":
             if logoutAdmin():
                 break
 
@@ -137,6 +146,26 @@ def showComments():
     message = "show comments " + token + " " + video_id
     response_from_proxy = send_to_server(message)
     print(response_from_proxy)
+
+def tagVideo():
+    global token
+    video_id = input("Video ID: ")
+    message = "tag video " + token + " " + video_id
+    response_from_proxy = send_to_server(message)
+    if response_from_proxy.startswith("Error"):
+        print(response_from_proxy)
+    else:
+        print("Tagged!")
+
+def removeVideo():
+    global token
+    video_id = input("Video ID: ")
+    message = "remove video " + token + " " + video_id
+    response_from_proxy = send_to_server(message)
+    if response_from_proxy.startswith("Error"):
+        print(response_from_proxy)
+    else:
+        print("Removed!")
 
 def loginUser():
     global token
