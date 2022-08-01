@@ -13,10 +13,15 @@ def send_to_server(message):
     s.close()
     return response_from_proxy
 
+def uploadVideo():
+    pass # TODO: upload video
+
 def userPanel():
     while True:
         print("Welcome to user panel!")
         print("all videos")
+        print("create video")
+        print("upload video")
         print("like video")
         print("dislike video")
         print("add comment")
@@ -28,6 +33,10 @@ def userPanel():
         selection = input("Your selection: ")
         if selection == "all videos":
             allVideos()
+        elif selection == "create video":
+            createVideo()
+        elif selection == "upload video":
+            uploadVideo()
         elif selection == "like video":
             likeVideo()
         elif selection == "dislike video":

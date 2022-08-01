@@ -388,6 +388,17 @@ def markAdminManagerTicket(data):
             return "Success"
     return "Error: ticket ID not found"
 
+def createVideo(data):
+    global all_videos
+    token = data.split(" ")[2]
+    name = data.split(" ")[3]
+    user = user_for_token(token)
+    if user == None:
+        return "Error: not authorized"
+    video_id = str(len(all_videos))
+    all_videos.append(Video(video_id, name, user.username))
+    return "Success"
+
 def prepare_response(data):
     if data.startswith("login user"):
         return loginUser(data)
@@ -439,6 +450,8 @@ def prepare_response(data):
         return markUserAdminTicket(data)
     elif data.startswith("mark admin_manager_ticket"):
         return markAdminManagerTicket(data)
+    elif data.startswith("create video"):
+        return createVideo(data)
     return "Error: bad request"
 
 
