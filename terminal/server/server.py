@@ -454,23 +454,23 @@ def prepare_response(data):
         return createVideo(data)
     return "Error: bad request"
 
+def handle_stream():
+    pass
+
 def handle_upload_receive():
     global s_upload
     while True:
         connection, address = s_upload.accept()
         file_name = connection.recv(1024).decode()
         connection.send("File name received".encode())
-        # print("File name received", file_name)
         file = open(file_name, "wb")
         while True:
             data = connection.recv(1024)
-            print("Data", data)
-            if not data:
+            if not data or len(data) < 1024:
                 break
             file.write(data)
         file.flush()
         connection.send("File received".encode())
-        print("Closing")
         file.close()
         connection.close()
 
@@ -499,9 +499,16 @@ s_upload.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 s_upload.bind((host, port_upload))
 s_upload.listen(5)
 
+# https://medium.com/nerd-for-tech/developing-a-live-video-streaming-application-using-socket-programming-with-python-6bc24e522f19
+s_upload = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s_upload.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+s_upload.bind((host, port_upload))
+s_upload.listen(5)
+
 print("Welcome to server!")
 
 threading.Thread(target=handle_upload_receive).start()
+threading.Thread(target=handle_stream).start()
 
 while True:
     connection, addr = s.accept()
