@@ -505,7 +505,7 @@ def authorizeProxy():
     proxy_username = input("Proxy Username: ")
     proxy_password = input("Proxy Password: ")
     message = "authorize proxy " + username + " " + proxy_username + " " + proxy_password
-    response_from_proxy = send_to_server(message)
+    response_from_proxy = send_to_server(message, True)
     if response_from_proxy.startswith("Error"):
         print(response_from_proxy)
     else:
@@ -519,7 +519,7 @@ def welcomeMenu():
         print("login admin")
         print("register admin")
         print("login manager")
-        print("authorize proxy")
+        print("authorize admin")
         print("upload test file")
         print("stream test file")
         print("exit")
