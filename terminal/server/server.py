@@ -280,8 +280,8 @@ def allAdmins(data):
         return "Error: not authorized"
     response = ""
     for user in all_admins:
-        response += "Username: " + user.username + " - Password: " + user.password + " - Is Accepted: " + user.is_accepted + "\n"
-    return 
+        response += "Username: " + user.username + " - Password: " + user.password + " - Is Accepted: " + str(user.is_accepted) + "\n"
+    return response
     
 def authorizeAdmin(data):
     global manager_token
@@ -612,8 +612,10 @@ def handle_upload_receive():
 
 def is_DDoS(source_host):
     global ip_time
+    if not (source_host in ip_time):
+        return False
     times = ip_time[source_host].sort()
-    if len(times) < 5:
+    if times == None or len(times) < 5:
         return False
     if times[-1] - times[-5] < 0.75:
         return True
