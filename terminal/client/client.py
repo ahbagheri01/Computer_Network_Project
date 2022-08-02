@@ -177,11 +177,25 @@ def adminPanel():
             if logoutAdmin(True):
                 break
 
+def setProxyAuth():
+    global token
+    username = input("Username: ")
+    proxy_username = input("Proxy username: ")
+    proxy_password = input("Proxy Password: ")
+    message = "set proxy_auth " + token + " " + username + " " + proxy_username + " " + proxy_password
+    response_from_proxy = send_to_server(message)
+    if response_from_proxy.startswith("Error"):
+        print(response_from_proxy)
+    else:
+        print("Set auth!")
+    
+
 def managerPanel():
     while True:
         print("Welcome to manager panel!")
         print("all admins")
         print("authorize admin")
+        print("set proxy_auth")
         print("see admin_manager_tickets")
         print("answer admin_manager_ticket")
         print("mark admin_manager_ticket")
@@ -191,6 +205,8 @@ def managerPanel():
             allAdmins()
         elif selection == "authorize admin":
             authorizeAdmin()
+        elif selection == "set proxy_auth":
+            setProxyAuth()
         elif selection == "see admin_manager_tickets":
             seeAdminManagerTickets()
         elif selection == "answer admin_manager_tickets":
