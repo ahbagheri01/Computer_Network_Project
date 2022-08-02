@@ -23,6 +23,12 @@ def authorizeProxy(data):
     result = send_to_server("is proxy_auth_correct " + username + " " + proxy_username + " " + proxy_password)
     return result.startswith("Success")
 
+def is_host_in_authorized_pairs(host):
+    for pair in authorized_pairs:
+        if host == pair[0]:
+            return True
+    return False
+
 def accept_connection(connection, source_host, source_port):
     global authorized_pairs
     print("accept_connection() - Accepted connection from " + source_host + ":" + str(source_port))
@@ -34,10 +40,10 @@ def accept_connection(connection, source_host, source_port):
         authorized_pairs.append((source_host, source_port))
         connection.send("Success".encode())
     else:
-        if (source_host, source_port) in authorized_pairs:
-            connection.sendall(send_to_server(data))
+        if is_host_in_authorized_pairs(source_host):
+            connection.sendall(send_to_server(data).encode())
         else:
-            connection.send("Error: not authorized")
+            connection.send("Error: not authorized".encode())
     connection.close()
 
 

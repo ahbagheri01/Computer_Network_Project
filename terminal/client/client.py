@@ -483,6 +483,18 @@ def loginManager():
         current_role = "manager"
         managerPanel()
 
+def authorizeProxy():
+    global token
+    username = input("Username: ")
+    proxy_username = input("Proxy Username: ")
+    proxy_password = input("Proxy Password: ")
+    message = "authorize proxy " + username + " " + proxy_username + " " + proxy_password
+    response_from_proxy = send_to_server(message)
+    if response_from_proxy.startswith("Error"):
+        print(response_from_proxy)
+    else:
+        print("Authorized!")
+
 def welcomeMenu():
     while True:
         print("Welcome to the video sharing system!")
@@ -491,6 +503,7 @@ def welcomeMenu():
         print("login admin")
         print("register admin")
         print("login manager")
+        print("authorize proxy")
         print("upload test file")
         print("stream test file")
         print("exit")
@@ -502,9 +515,11 @@ def welcomeMenu():
         elif selection == "login admin":
             loginAdmin(True)
         elif selection == "register admin":
-            registerAdmin(True)
+            registerAdmin(False)
         elif selection == "login manager":
             loginManager()
+        elif selection == "authorize proxy":
+            authorizeProxy()
         elif selection == "upload test file":
             upload_file_to_server("1.mp4")
         elif selection == "stream test file":
