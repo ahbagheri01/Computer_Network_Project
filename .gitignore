@@ -44,3 +44,6 @@ terminal/server/1-old.mp4
 terminal/.DS_Store
 terminal/server/.DS_Store
 terminal/client/0.mp4
+terminal/server/0.mp4
+.gitignore
+terminal/client/0-old.mp4
