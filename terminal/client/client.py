@@ -158,7 +158,7 @@ def adminPanel():
         if selection == "all videos":
             allVideos(True)
         elif selection == "stream video":
-            streamVideo() # TODO: Proxy here
+            streamVideo()
         elif selection == "tag videos":
             tagVideo(True)
         elif selection == "remove videos":
