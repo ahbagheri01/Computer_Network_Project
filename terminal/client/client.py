@@ -14,7 +14,11 @@ def upload_file_to_server(file_name):
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind(("127.0.0.1", 0))
     s.connect(("127.0.0.1", 5003))
-    f = open(file_name, "rb")
+    try:
+        f = open(file_name, "rb")
+    except:
+        print("Error: file not found")
+        return
     s.send(file_name.encode())
     s.recv(1024)
     data = f.read()
@@ -74,7 +78,7 @@ def send_to_server(message, should_use_proxy = False):
 
 def uploadVideo():
     file_name = input("Video ID (should be the same as file name, without '.mp4'. If not, change the file name before uploading): ")
-    upload_file_to_server(file_name)
+    upload_file_to_server(file_name + ".mp4")
 
 def createVideo():
     global token
@@ -89,7 +93,7 @@ def createVideo():
 def streamVideo():
     if token != "":
         file_name = input("Video ID: ")
-        stream_file_from_server(file_name)
+        stream_file_from_server(file_name + ".mp4")
     else:
         print("Error: not authorized")
 

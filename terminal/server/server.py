@@ -185,7 +185,7 @@ def allVideos(data, host, port):
     global all_videos
     response = ""
     for video in all_videos:
-        response += "ID: " + video.id + " - Name: " + video.name + " - Username: " + video.username + "\n"
+        response += "ID: " + video.id + " - Name: " + video.name + " - Username: " + video.username + " - Number of likes: " + str(video.number_of_likes) + " - Number of dislikes: " + str(video.number_of_dislikes) + " - Is tagged: " + str(video.is_tagged) + "\n"
     return response
 
 def likeVideo(data):
@@ -197,7 +197,7 @@ def likeVideo(data):
         return "Error: not authorized"
     for video in all_videos:
         if video.id == video_id:
-            video.number_of_dislikes += 1
+            video.number_of_likes += 1
             return "Success"
     return "Error: video not found"
 
@@ -577,7 +577,11 @@ def handle_stream():
             continue
         file_name = connection.recv(1024).decode()
         connection.send("File name received".encode())
-        video = cv2.VideoCapture(file_name)
+        try:
+            video = cv2.VideoCapture(file_name)
+        except:
+            print("Error: file not found")
+            return
         while video.isOpened():
             image, frame = video.read()
             dump = pickle.dumps(frame)
@@ -599,7 +603,11 @@ def handle_upload_receive():
             continue
         file_name = connection.recv(1024).decode()
         connection.send("File name received".encode())
-        file = open(file_name, "wb")
+        try:
+            file = open(file_name, "wb")
+        except:
+            print("Error: file not found")
+            return
         while True:
             data = connection.recv(1024)
             if not data or len(data) < 1024:
