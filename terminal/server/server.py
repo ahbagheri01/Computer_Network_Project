@@ -414,7 +414,7 @@ def seeAdminManagerTickets(data, host, port):
             if ticket.username == admin.username:
                 response += "ID: " + str(ticket.id) + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
         else:
-            response += "ID: " + str(ticket.id) + + " - Username: " + ticket.username + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
+            response += "ID: " + str(ticket.id) + " - Username: " + ticket.username + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
     return response
 
 def markUserAdminTicket(data, host, port):
