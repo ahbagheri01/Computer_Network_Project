@@ -340,7 +340,7 @@ def sendUserAdminTicket(data):
     user = user_for_token(token)
     if user == None:
         return "Error: not authorized"
-    all_user_admin_tickets.append(Ticket(user.username, content))
+    all_user_admin_tickets.append(Ticket(len(all_user_admin_tickets), user.username, content))
     return "Success"
 
 def sendAdminManagerTicket(data, host, port):
@@ -350,7 +350,7 @@ def sendAdminManagerTicket(data, host, port):
     user = admin_for_token(token, host, port)
     if user == None:
         return "Error: not authorized"
-    all_admin_manager_tickets.append(Ticket(user.username, content))
+    all_admin_manager_tickets.append(Ticket(len(all_admin_manager_tickets), user.username, content))
     return "Success"
 
 def answerUserAdminTicket(data, host, port):
