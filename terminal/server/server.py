@@ -395,10 +395,10 @@ def seeUserAdminTickets(data, host, port):
     response = ""
     for ticket in all_user_admin_tickets:
         if user != None:
-            if ticket.user == user.username:
-                response += "ID: " + ticket.id + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
+            if ticket.username == user.username:
+                response += "ID: " + str(ticket.id) + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
         else:
-            response += "ID: " + ticket.id + " - Username: " + ticket.username + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
+            response += "ID: " + str(ticket.id) + " - Username: " + ticket.username + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
     return response
 
 def seeAdminManagerTickets(data, host, port):
@@ -420,7 +420,7 @@ def seeAdminManagerTickets(data, host, port):
 def markUserAdminTicket(data, host, port):
     global all_user_admin_tickets
     token = data.split(" ")[2]
-    ticket_id = data.split(" ")[3]
+    ticket_id = int(data.split(" ")[3])
     status = data.split(" ")[4]
     user = user_for_token(token)
     if user == None:
