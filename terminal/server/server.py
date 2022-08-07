@@ -356,7 +356,7 @@ def sendAdminManagerTicket(data, host, port):
 def answerUserAdminTicket(data, host, port):
     global all_user_admin_tickets
     token = data.split(" ")[2]
-    ticket_id = data.split(" ")[3]
+    ticket_id = int(data.split(" ")[3])
     answer = data.split(" ")[4]
     user = admin_for_token(token, host, port)
     if user == None:
@@ -372,7 +372,7 @@ def answerUserAdminTicket(data, host, port):
 def answerAdminManagerTicket(data):
     global all_admin_manager_tickets
     token = data.split(" ")[2]
-    ticket_id = data.split(" ")[3]
+    ticket_id = int(data.split(" ")[3])
     answer = data.split(" ")[4]
     if token != manager_token:
         return "Error: not authorized"
@@ -411,10 +411,10 @@ def seeAdminManagerTickets(data, host, port):
     response = ""
     for ticket in all_admin_manager_tickets:
         if admin != None:
-            if ticket.user == admin.username:
-                response += "ID: " + ticket.id + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
+            if ticket.username == admin.username:
+                response += "ID: " + str(ticket.id) + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
         else:
-            response += "ID: " + ticket.id + + " - Username: " + ticket.username + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
+            response += "ID: " + str(ticket.id) + + " - Username: " + ticket.username + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
     return response
 
 def markUserAdminTicket(data, host, port):
@@ -436,7 +436,7 @@ def markUserAdminTicket(data, host, port):
 def markAdminManagerTicket(data, host, port):
     global all_admin_manager_tickets
     token = data.split(" ")[2]
-    ticket_id = data.split(" ")[3]
+    ticket_id = int(data.split(" ")[3])
     status = data.split(" ")[4]
     admin = admin_for_token(token, host, port)
     if admin == None:
