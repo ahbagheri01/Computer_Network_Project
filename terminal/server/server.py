@@ -218,7 +218,7 @@ def addComment(data):
     global all_videos
     token = data.split(" ")[2]
     video_id = data.split(" ")[3]
-    text = data.split(" ")[4]
+    text = ' '.join(data.split(" ")[4:])
     user = user_for_token(token)
     if user == None:
         return "Error: not authorized"
@@ -336,7 +336,7 @@ def isProxyAuthCorrect(data, host, port):
 def sendUserAdminTicket(data):
     global all_user_admin_tickets
     token = data.split(" ")[2]
-    content = data.split(" ")[3]
+    content = ' '.join(data.split(" ")[3:])
     user = user_for_token(token)
     if user == None:
         return "Error: not authorized"
@@ -346,7 +346,7 @@ def sendUserAdminTicket(data):
 def sendAdminManagerTicket(data, host, port):
     global all_admin_manager_tickets
     token = data.split(" ")[2]
-    content = data.split(" ")[3]
+    content = ' '.join(data.split(" ")[3:])
     user = admin_for_token(token, host, port)
     if user == None:
         return "Error: not authorized"
@@ -357,7 +357,7 @@ def answerUserAdminTicket(data, host, port):
     global all_user_admin_tickets
     token = data.split(" ")[2]
     ticket_id = int(data.split(" ")[3])
-    answer = data.split(" ")[4]
+    answer = ' '.join(data.split(" ")[4:])
     user = admin_for_token(token, host, port)
     if user == None:
         return "Error: not authorized"
@@ -373,7 +373,7 @@ def answerAdminManagerTicket(data):
     global all_admin_manager_tickets
     token = data.split(" ")[2]
     ticket_id = int(data.split(" ")[3])
-    answer = data.split(" ")[4]
+    answer = ' '.join(data.split(" ")[4:])
     if token != manager_token:
         return "Error: not authorized"
     for ticket in all_admin_manager_tickets:
@@ -451,7 +451,7 @@ def markAdminManagerTicket(data, host, port):
 def createVideo(data):
     global all_videos
     token = data.split(" ")[2]
-    name = data.split(" ")[3]
+    name = ' '.join(data.split(" ")[3:])
     user = user_for_token(token)
     if user == None:
         return "Error: not authorized"

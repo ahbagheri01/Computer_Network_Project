@@ -523,7 +523,7 @@ def welcomeMenu():
         print("login admin")
         print("register admin")
         print("login manager")
-        print("authorize admin")
+        print("authorize proxy")
         print("upload test file")
         print("stream test file")
         print("exit")
