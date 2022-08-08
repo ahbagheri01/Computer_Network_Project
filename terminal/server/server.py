@@ -628,6 +628,7 @@ def is_DDoS(source_host):
         return False
     print(times[-1] - times[-2])
     if times[-1] - times[-2] < 100:
+        print("DDoS!")
         return True
     return False
 
