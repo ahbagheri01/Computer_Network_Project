@@ -23,9 +23,9 @@ def upload_file_to_server(file_name):
     s.recv(1024)
     data = f.read()
     s.sendall(data)
-    s.recv(1024)
-    f.close()
-    s.close()
+    # s.recv(1024)
+    # f.close()
+    # s.close()
 
 # https://medium.com/nerd-for-tech/developing-a-live-video-streaming-application-using-socket-programming-with-python-6bc24e522f19
 def stream_file_from_server(file_name):
