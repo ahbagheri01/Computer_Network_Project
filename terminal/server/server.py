@@ -218,7 +218,7 @@ def addComment(data):
     global all_videos
     token = data.split(" ")[2]
     video_id = data.split(" ")[3]
-    text = data.split(" ")[4]
+    text = ' '.join(data.split(" ")[4:])
     user = user_for_token(token)
     if user == None:
         return "Error: not authorized"
@@ -336,28 +336,28 @@ def isProxyAuthCorrect(data, host, port):
 def sendUserAdminTicket(data):
     global all_user_admin_tickets
     token = data.split(" ")[2]
-    content = data.split(" ")[3]
+    content = ' '.join(data.split(" ")[3:])
     user = user_for_token(token)
     if user == None:
         return "Error: not authorized"
-    all_user_admin_tickets.append(Ticket(user.username, content))
+    all_user_admin_tickets.append(Ticket(len(all_user_admin_tickets), user.username, content))
     return "Success"
 
 def sendAdminManagerTicket(data, host, port):
     global all_admin_manager_tickets
     token = data.split(" ")[2]
-    content = data.split(" ")[3]
+    content = ' '.join(data.split(" ")[3:])
     user = admin_for_token(token, host, port)
     if user == None:
         return "Error: not authorized"
-    all_admin_manager_tickets.append(Ticket(user.username, content))
+    all_admin_manager_tickets.append(Ticket(len(all_admin_manager_tickets), user.username, content))
     return "Success"
 
 def answerUserAdminTicket(data, host, port):
     global all_user_admin_tickets
     token = data.split(" ")[2]
-    ticket_id = data.split(" ")[3]
-    answer = data.split(" ")[4]
+    ticket_id = int(data.split(" ")[3])
+    answer = ' '.join(data.split(" ")[4:])
     user = admin_for_token(token, host, port)
     if user == None:
         return "Error: not authorized"
@@ -372,8 +372,8 @@ def answerUserAdminTicket(data, host, port):
 def answerAdminManagerTicket(data):
     global all_admin_manager_tickets
     token = data.split(" ")[2]
-    ticket_id = data.split(" ")[3]
-    answer = data.split(" ")[4]
+    ticket_id = int(data.split(" ")[3])
+    answer = ' '.join(data.split(" ")[4:])
     if token != manager_token:
         return "Error: not authorized"
     for ticket in all_admin_manager_tickets:
@@ -395,10 +395,10 @@ def seeUserAdminTickets(data, host, port):
     response = ""
     for ticket in all_user_admin_tickets:
         if user != None:
-            if ticket.user == user.username:
-                response += "ID: " + ticket.id + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
+            if ticket.username == user.username:
+                response += "ID: " + str(ticket.id) + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
         else:
-            response += "ID: " + ticket.id + " - Username: " + ticket.username + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
+            response += "ID: " + str(ticket.id) + " - Username: " + ticket.username + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
     return response
 
 def seeAdminManagerTickets(data, host, port):
@@ -411,16 +411,16 @@ def seeAdminManagerTickets(data, host, port):
     response = ""
     for ticket in all_admin_manager_tickets:
         if admin != None:
-            if ticket.user == admin.username:
-                response += "ID: " + ticket.id + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
+            if ticket.username == admin.username:
+                response += "ID: " + str(ticket.id) + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
         else:
-            response += "ID: " + ticket.id + + " - Username: " + ticket.username + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
+            response += "ID: " + str(ticket.id) + " - Username: " + ticket.username + " - Status: " + ticket.status + " - Content: '" + ticket.content + "' - Answer: '" + ticket.answer + "'\n"
     return response
 
 def markUserAdminTicket(data, host, port):
     global all_user_admin_tickets
     token = data.split(" ")[2]
-    ticket_id = data.split(" ")[3]
+    ticket_id = int(data.split(" ")[3])
     status = data.split(" ")[4]
     user = user_for_token(token)
     if user == None:
@@ -436,7 +436,7 @@ def markUserAdminTicket(data, host, port):
 def markAdminManagerTicket(data, host, port):
     global all_admin_manager_tickets
     token = data.split(" ")[2]
-    ticket_id = data.split(" ")[3]
+    ticket_id = int(data.split(" ")[3])
     status = data.split(" ")[4]
     admin = admin_for_token(token, host, port)
     if admin == None:
@@ -451,7 +451,7 @@ def markAdminManagerTicket(data, host, port):
 def createVideo(data):
     global all_videos
     token = data.split(" ")[2]
-    name = data.split(" ")[3]
+    name = ' '.join(data.split(" ")[3:])
     user = user_for_token(token)
     if user == None:
         return "Error: not authorized"
