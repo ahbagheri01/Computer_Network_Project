@@ -622,10 +622,12 @@ def is_DDoS(source_host):
     global ip_time
     if not (source_host in ip_time):
         return False
-    times = ip_time[source_host].sort()
+    ip_time[source_host].sort()
+    times = ip_time[source_host]
     if times == None or len(times) < 5:
         return False
-    if times[-1] - times[-5] < 0.75:
+    print(times[-1] - times[-2])
+    if times[-1] - times[-2] < 100:
         return True
     return False
 
