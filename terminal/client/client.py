@@ -159,9 +159,9 @@ def adminPanel():
             allVideos(True)
         elif selection == "stream video":
             streamVideo()
-        elif selection == "tag videos":
+        elif selection == "tag video":
             tagVideo(True)
-        elif selection == "remove videos":
+        elif selection == "remove video":
             removeVideo(True)
         elif selection == "remove strike":
             removeStrike(True)
